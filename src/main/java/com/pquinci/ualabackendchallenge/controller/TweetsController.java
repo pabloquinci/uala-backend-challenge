@@ -1,7 +1,6 @@
 package com.pquinci.ualabackendchallenge.controller;
 
-import com.pquinci.ualabackendchallenge.dto.PostTweetDTO;
-import com.pquinci.ualabackendchallenge.dto.PostTweetDTOResponse;
+import com.pquinci.ualabackendchallenge.dto.*;
 import com.pquinci.ualabackendchallenge.model.Tweet;
 import com.pquinci.ualabackendchallenge.service.TweetsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,24 +31,41 @@ public class TweetsController {
     }
 
 
+    @PutMapping("/follow")
+    public ResponseEntity<String> follow(@RequestBody FollowDTORequest request){
+
+        String response=tweetsService.follow(request);
+
+        return ResponseEntity.ok(response);
+
+
+    }
+
+
     @GetMapping("/findTweet/{id}")
     public ResponseEntity<PostTweetDTOResponse> post(@PathVariable(name="id") Long id){
-        ClassLoader classLoader= Tweet.class.getClassLoader();
-
-        System.out.println(classLoader);
 
         PostTweetDTOResponse response=tweetsService.findById(id);
 
-
-     //   if(response.isPresent()){
-            //return ResponseEntity.ok(response.get());
-       //     PostTweetDTOResponse postResp=response.get();
-            Tweet twit= Tweet.builder().text(response.getText()).build();
+            Tweet twit= Tweet.builder().text(response.getText())
+                    .username(response.getUsername())
+                    //.fecha(response.getFecha())
+                    .build();
             return ResponseEntity.ok(response);
-       // }
 
-       // return ResponseEntity.internalServerError().build();
 
     }
+
+    @GetMapping("/getTimeline/{username}")
+    public ResponseEntity<TimelineUsuario> getTimeline(@PathVariable(name="username") String username){
+        TimelineUsuario response=tweetsService.followersTweets(username);
+
+        return ResponseEntity.ok(response);
+
+
+    }
+
+
+
 
 }
