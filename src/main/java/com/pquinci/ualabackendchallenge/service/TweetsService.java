@@ -10,9 +10,9 @@ public interface TweetsService {
 
     Optional<PostTweetDTOResponse> post(PostTweetDTO request);
 
-    PostTweetDTOResponse findById(Long id);
+    Optional<PostTweetDTOResponse> findById(Long id);
 
-    String follow(FollowDTORequest request);
+    Optional<String> follow(FollowDTORequest request);
 
     TimelineUsuario followersTweets(String username);
 

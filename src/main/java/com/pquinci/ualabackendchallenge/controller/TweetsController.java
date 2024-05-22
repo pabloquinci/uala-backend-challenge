@@ -34,9 +34,14 @@ public class TweetsController {
     @PutMapping("/follow")
     public ResponseEntity<String> follow(@RequestBody FollowDTORequest request){
 
-        String response=tweetsService.follow(request);
+        Optional<String> response=tweetsService.follow(request);
 
-        return ResponseEntity.ok(response);
+        if (response.isPresent()){
+            return ResponseEntity.ok(response.get());
+
+        }
+        return ResponseEntity.internalServerError().build();
+
 
 
     }
@@ -45,14 +50,16 @@ public class TweetsController {
     @GetMapping("/findTweet/{id}")
     public ResponseEntity<PostTweetDTOResponse> post(@PathVariable(name="id") Long id){
 
-        PostTweetDTOResponse response=tweetsService.findById(id);
+        Optional<PostTweetDTOResponse> response=tweetsService.findById(id);
 
-            Tweet twit= Tweet.builder().text(response.getText())
-                    .username(response.getUsername())
+        if(response.isPresent()){
+            Tweet twit= Tweet.builder().text(response.get().getText())
+                    .username(response.get().getUsername())
                     //.fecha(response.getFecha())
                     .build();
-            return ResponseEntity.ok(response);
-
+            return ResponseEntity.ok(response.get());
+        }
+        return ResponseEntity.internalServerError().build();
 
     }
 

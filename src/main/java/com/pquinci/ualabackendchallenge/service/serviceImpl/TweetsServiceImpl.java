@@ -16,6 +16,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,8 +36,9 @@ public class TweetsServiceImpl implements TweetsService {
     UserRepository userRepository;
 
     @Autowired
-    public TweetsServiceImpl(TweetsRepository tweetsRepository){
+    public TweetsServiceImpl(TweetsRepository tweetsRepository,UserRepository userRepository){
         this.tweetsRepository=tweetsRepository;
+        this.userRepository=userRepository;
     }
 
     @Override
@@ -54,7 +56,7 @@ public class TweetsServiceImpl implements TweetsService {
 
     @Override
     @Cacheable(cacheNames = CacheConfig.USER_CACHE, unless = "#result == null")
-    public PostTweetDTOResponse findById(Long id) {
+    public Optional<PostTweetDTOResponse> findById(Long id) {
 
         Optional<Tweet> response= tweetsRepository.findById(id);
 
@@ -66,13 +68,13 @@ public class TweetsServiceImpl implements TweetsService {
                     .fecha(response.get().getFecha())
                     .build();
          //   return Optional.of(respDTO);
-            return respDTO;
+            return Optional.of(respDTO);
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override
-    public String follow(FollowDTORequest request) {
+    public Optional<String> follow(FollowDTORequest request) {
         Optional<User> user=userRepository.findByUsername(request.getUserFollower());
         Optional<User> userFollowwed=userRepository.findByUsername(request.getUserFollowed());
 
@@ -86,7 +88,7 @@ public class TweetsServiceImpl implements TweetsService {
         user.get().getFollows().add(userFollowwed.get());
         userRepository.save(user.get());
 
-        return "Usuario" +user.get().getUsername()+ "Siguiendo a "+ userFollowwed.get().getUsername();
+        return Optional.of("Usuario " +user.get().getUsername()+ "Siguiendo a "+ userFollowwed.get().getUsername());
     }
 
     @Override
